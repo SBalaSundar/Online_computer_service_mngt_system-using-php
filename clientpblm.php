@@ -1,67 +1,106 @@
-<?php
-$db = mysqli_connect('localhost', 'root', '', 'onlineservice');
-session_start();
-if($usrid=$_SESSION['sessid']){
-?> 
-<?php    include 'header.php';?>
-<body bgcolor="aabbcc">
-<?php    include 'nav-bar.php';?>
-    <br/><br/><br/>
-<h3> View Problems </h3>
+<?php $res1='';
+$flag = 0;?>
+<html>
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<style type="text/css">
+	table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 70%;
+    align: center;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+tr:nth-child(odd) {
+    background-color: #e6f2ff;
+}
+select {
+        width: 150px;
+        margin: 10px;
+		color:#aaa;
+    }
+    select:focus {
+        min-width: 150px;
+        width: auto;
+    } 
+	option:not(first-child) {
+        color: #000;
+    }
+</style>
+<?php require_once 'header.php'; ?>
+</head>
+<body>
+    <?php    require_once 'nav-bar.php'; ?>
+<br><br><br><h3> View Problems </h3>
 <form method="POST">
 <select name="viewcategory">
-<?php
-//$viewby = $eng->getViewCat();
-$sqlq = "select * from viewbycat";
-$res = mysqli_query($db, $sqlq);
-while ($tables = mysqli_fetch_array($res)) {
-    echo '<option value="' . $tables['cat_id'] . '">' . $tables['cat_name'] .
-        '</option>';
-}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-?>
+    <option value="nac">Not Accepted</option>
+    <option value="ac">Accepted</option>
+    <option value="nat">Not Attended</option>
+    <option value="at">Attended</option>
 </select>
 <button type="submit" name="select1"><b>Select</b></button>
 <?php
 if(isset($_POST['select1'])){
     $selected1 = $_POST['viewcategory'];
-    $_SESSION['selectedprob'] = $selected1;
-    $sql="select $selected1 from problem";
-    $res1 = mysqli_query($db,$sql);
-    echo '<select name="listproblem">';
-    while($fields = mysqli_fetch_array($res1)){
-    echo '<option value="' . $fields[$selected1] . '">'. $fields[$selected1].'</option>';}
-echo '</select>
-<button name="select2" type="submit"><b>Select</b></button>';
-}
-       if(isset($_POST['select2'])){
-           $sprob = $_POST['listproblem'];
-           $selected1 = $_SESSION['selectedprob'];
-           $sql3 = "Select * from problem where $selected1='$sprob'";
-           $res1 = mysqli_query($db, $sql3); ?>
-           <table class="table table-striped table-bordered" align="center" border="2" cellpadding="7"> <th>ProblemId</th><th>CustomerID</th><th>DeviceType</th><th>ProblemType</th><th>Description</th>
-               <th>Acceptance</th><th>ProblemStatus</th>
-        <?php while ($row = mysqli_fetch_array($res1)) { ?>
-	<tbody><tr>
-                <td><a href="view_prob.php?id=<?php echo $row['Problem_id'] ?>"><?php echo $row['Problem_id'];?></a></td>
-                <td><?php echo $row['Customer_id'];?></td>
-                <td><?php echo $row['Device'];?></td>
-                <td><?php echo $row['Problem_type'];?></td>
-                <td><?php echo $row['Description'];?></td>
-                <td><?php echo $row['Acceptance'];?></td>
-                <td><?php echo $row['Status'];?></td>
-</tr>
+    $usrid=$_SESSION['sessid'];
+    $sql="";
+    if($selected1 == 'nat'){
+    $sql="select * from problem where Status='Not Attended' and Customer_id='$usrid'";
+    }
+$res1 = mysqli_query($db,$sql);  
+?>
 <?php
-    }
-    ?>
- </tbody>
- </table>
- <?php
-    }
+echo'<table align="center"> <th>ProblemId</th><th>ProblemType</th><th>Description</th>
+               <th>Acceptance</th><th>ProblemStatus</th>';
+while ($row = mysqli_fetch_array($res1)) {
+	echo '<tbody><tr>';?>
+        <td><a href="view_prob.php?id=<?php echo $row['Problem_id'] ?>"><?php echo $row['Problem_id'];?></a></td>
+<?php	echo'<td>' . $row['Problem_type'] . '</td>
+	<td>' . $row['Description'] . '</td>
+	<td>' . $row['Acceptance'] . '</td>
+	<td>' . $row['Status'] . '</td>
+</tr>';
+}
 }
 else{
-    echo "<script type='text/javascript'>alert('Un authorized Access')</script>";
+  $clid=$_SESSION['sessid'];
+echo'<table align="center"> <th>ProblemId</th><th>ProblemType</th><th>Description</th>
+               <th>Acceptance</th><th>ProblemStatus</th>';
+$usrid=$_SESSION['sessid'];
+           $sql3 = "Select * from problem where Customer_id='$usrid'";
+           $res1 = mysqli_query($db, $sql3);
+      if($flag==0){
+        while ($row = mysqli_fetch_array($res1)) {
+	echo '<tbody><tr>';?>
+	<td><a href="view_prob.php?id=<?php echo $row['Problem_id'] ?>"><?php echo $row['Problem_id'];?></a></td>
+<?php
+	echo '<td>' . $row['Problem_type'] . '</td>
+	<td>' . $row['Description'] . '</td>
+	<td>' . $row['Acceptance'] . '</td>
+	<td>' . $row['Status'] . '</td>
+</tr>';
+    }
+      }
 }
 ?>
+</tbody>
+ </table>
 </form>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 </html>
+<?php require 'ServiceEngineer.php';
+$eng = new ServiceEng();
+?>

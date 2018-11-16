@@ -15,13 +15,13 @@ public function getInstance() {
 	if($sql = mysqli_query($this->mysqli,$sql)){return true;}
 	else {return false;}	
 	}*/
-public function insertEngineer($engid,$name,$street,$city,$pincode,$contactno,$photo,$gender){
+public function insertEngineer($engid,$name,$street,$city,$pincode,$contactno){
 	$sql = "SELECT engid from engineer where engid='".$engid."'"; 
 	$chk = mysqli_query($this->mysqli,$sql);
 	$uid = mysqli_fetch_array($chk);
 	if($uid['engid']==$engid){return false;}
 	else {
-	$sql = "INSERT INTO engineer VALUES('".$engid."','".$name."','".$street."','".$city."','".$pincode."','".$contactno."','".$photo."','".$gender."')";
+	$sql = "INSERT INTO engineer VALUES('".$engid."','".$name."','".$street."','".$city."','".$pincode."','".$contactno."')";
 	$res = mysqli_query($this->mysqli,$sql);
 	if($res){return true;}
 	else{return mysqli_error($this->mysqli);}
@@ -85,10 +85,20 @@ public function getViewCat(){
     $arr = mysqli_fetch_array($res);
     return arr;
 }
-public function Specialization($engid,$special){
-	$sql = "INSERT INTO special VALUES('".$engid."','".$special."')";
-	$res = mysqli_query($this->mysqli,$sql);
-	if($res){return true;}
-	else{return false;}
+public function eRate($engid){
+    $count=0;
+    $total=0;
+    $sql = "select * from problem where Eng_id='$engid'";
+    $res = mysqli_query($this->mysqli, $sql);
+   if($res){
+    while($arr = mysqli_fetch_array($res)){
+        if($arr['rating']!='NR'){
+            $count+=1;
+            $total+=$arr['rating'];
+            return ($total/$count)/20;
+        }
+    }
+   }
+   else{return 0;}
 }
 }
